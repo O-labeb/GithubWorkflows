@@ -9,6 +9,8 @@ on:
 jobs:
   start-new-hotfix:
     name: Start a new hotfix
+    env:
+      Version: Hellooooooooz
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -30,7 +32,7 @@ jobs:
       - name: Print stuff
         run: |
           echo "hhhh"
-          echo ${version_number}
+          echo $Version
 
       - name: Bump version
         run: |
