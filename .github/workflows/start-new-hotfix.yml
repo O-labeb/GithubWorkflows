@@ -15,17 +15,21 @@ jobs:
         with:
           ref: main
 
+      - name: Set var
+        run: |
+          version_number=5555
+          
       - name: Create hotfix branch
         run: git checkout -b ${{ github.event.inputs.version_number }}
 
       - name: Initialize mandatory git config
         run: |
-          git config user.name "Alfred Swift"
-          git config user.email ios@swvl.com
+          git config user.name "Omar Labib"
+          git config user.email omar.labib@swvl.com
 
       - name: Print stuff
         run: |
-          echo ${{ github.event.inputs.version_number }}
+          echo ${{ version_number }}
 
       - name: Bump version
         run: |
