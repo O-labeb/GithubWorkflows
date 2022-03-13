@@ -10,7 +10,7 @@ jobs:
   start-new-hotfix:
     name: Start a new hotfix
     env:
-      Version: Hellooooooooz
+      Version: ${{ github.event.inputs.version_number }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
