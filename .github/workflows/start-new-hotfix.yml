@@ -39,7 +39,7 @@ jobs:
           echo $adjusted_version
           
       - name: Create hotfix branch
-        run: git checkout -b ${{ github.event.inputs.version_number }}
+        run: git checkout -b $adjusted_version
 
       - name: Initialize mandatory git config
         run: |
