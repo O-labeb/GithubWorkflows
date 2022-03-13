@@ -19,7 +19,8 @@ jobs:
 
       - name: Set var
         run: |
-          $Version=koko
+          Version=koko
+          echo $Version
           
       - name: Create hotfix branch
         run: git checkout -b ${{ github.event.inputs.version_number }}
