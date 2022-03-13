@@ -64,7 +64,7 @@ jobs:
           echo "::set-output name=commit::$(git rev-parse HEAD)"
 
       - name: Push hotfix branch
-        run: git push origin ${{ $adjusted_version }}
+        run: git push origin $adjusted_version
 
       - name: Create pull request
         uses: repo-sync/pull-request@v2
