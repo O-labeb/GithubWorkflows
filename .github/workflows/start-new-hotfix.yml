@@ -23,6 +23,10 @@ jobs:
           git config user.name "Alfred Swift"
           git config user.email ios@swvl.com
 
+      - name: Print stuff
+        run: |
+          echo ${{ github.event.inputs.version_number }}
+
       - name: Bump version
         run: |
           sed -i'' 's/MARKETING_VERSION \= [^\;]*\;/MARKETING_VERSION = ${{ github.event.inputs.version_number }};/' GithubWorkFlows.xcodeproj/project.pbxproj
