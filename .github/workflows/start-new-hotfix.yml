@@ -40,7 +40,7 @@ jobs:
           echo "::set-output name=commit::$(git rev-parse HEAD)"
 
       - name: Push hotfix branch
-        run: git push origin hotfix/${{ github.event.inputs.version_number }}
+        run: git push origin ${{ github.event.inputs.version_number }}
 
       - name: Create pull request
         uses: repo-sync/pull-request@v2
