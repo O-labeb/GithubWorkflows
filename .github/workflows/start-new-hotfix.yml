@@ -16,7 +16,7 @@ jobs:
           ref: main
 
       - name: Create hotfix branch
-        run: git checkout -b hotfix/${{ github.event.inputs.version_number }}
+        run: git checkout -b ${{ github.event.inputs.version_number }}
 
       - name: Initialize mandatory git config
         run: |
