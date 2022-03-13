@@ -29,6 +29,7 @@ jobs:
 
       - name: Print stuff
         run: |
+            echo "hhhh"
           echo ${version_number}
 
       - name: Bump version
@@ -43,23 +44,23 @@ jobs:
           git commit --message "Bump version number"
           echo "::set-output name=commit::$(git rev-parse HEAD)"
 
-      - name: Push hotfix branch
-        run: git push origin ${{ github.event.inputs.version_number }}
-
-      - name: Create pull request
-        uses: repo-sync/pull-request@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          source_branch: hotfix/${{ github.event.inputs.version_number }}
-          destination_branch: master
-          pr_title: Merge Hotfix ${{ github.event.inputs.version_number }} Into Master
-          pr_reviewer: ${{ github.actor }}
-          pr_assignee: ${{ github.actor }}
-          pr_label: hotfix
-          pr_body: |
-            Hi @${{ github.actor }}
-            This PR was created in response to the hotfix workflow for version number: ${{ github.event.inputs.version_number }}
-            - I've bumped the versions in this commit: ${{ steps.make-version-commit.outputs.commit }}
-
-            Merging this PR will create a GitHub release (Tag) and complete the release flow.
-            **Note:** You shouldn't squash and merge this PR. Use a normal merge instead.
+#      - name: Push hotfix branch
+#        run: git push origin ${{ github.event.inputs.version_number }}
+#
+#      - name: Create pull request
+#        uses: repo-sync/pull-request@v2
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          source_branch: hotfix/${{ github.event.inputs.version_number }}
+#          destination_branch: master
+#          pr_title: Merge Hotfix ${{ github.event.inputs.version_number }} Into Master
+#          pr_reviewer: ${{ github.actor }}
+#          pr_assignee: ${{ github.actor }}
+#          pr_label: hotfix
+#          pr_body: |
+#            Hi @${{ github.actor }}
+#            This PR was created in response to the hotfix workflow for version number: ${{ github.event.inputs.version_number }}
+#            - I've bumped the versions in this commit: ${{ steps.make-version-commit.outputs.commit }}
+#
+#            Merging this PR will create a GitHub release (Tag) and complete the release flow.
+#            **Note:** You shouldn't squash and merge this PR. Use a normal merge instead.
