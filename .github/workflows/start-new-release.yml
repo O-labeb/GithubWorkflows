@@ -1,0 +1,71 @@
+name: Start a new release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_number:
+        description: Version Number
+        required: true
+
+jobs:
+  start-new-release:
+    name: "Start a new release"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create release branch
+        run: git checkout -b release/${{ github.event.inputs.version_number }}
+
+      # In order to make a commit, we need to initialize a user.
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "Alfred Swift"
+          git config user.email ios@swvl.com
+
+      # Replaces the marketing version number with the version number given to the workflow and increment build number.
+      - name: Bump version
+        run: |
+          sed -i'' 's/MARKETING_VERSION \= [^\;]*\;/MARKETING_VERSION = ${{ github.event.inputs.version_number }};/' Swvl.xcodeproj/project.pbxproj
+          perl -i -pe 's/(CURRENT_PROJECT_VERSION = )(\d+)(\;)$/$1.($2+1).$3/e' Swvl.xcodeproj/project.pbxproj
+
+      - name: Commit changes
+        id: make-version-commit
+        run: |
+          git add .
+          git commit --message "Bump version number"
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
+
+      # This have been disabled until we fix the rate limit issue
+      # - name: Generate changelog
+      #   run: |
+      #     sudo gem install github_changelog_generator
+      #     github_changelog_generator -u swvl -p customer-iOS-v2 --future-release ${{ github.event.inputs.version_number }} --exclude-labels release,hotfix -t ${{ secrets.CHANGELOG_GENERATOR_TOKEN }}
+
+      # - name: Commit changes
+      #   id: make-changelog-commit
+      #   run: |
+      #     git add .
+      #     git commit --message "Update Changelog.md"
+      #     echo "::set-output name=commit::$(git rev-parse HEAD)"
+
+      - name: Push release branch
+        run: git push origin release/${{ github.event.inputs.version_number }}
+
+      - name: Create pull request
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: release/${{ github.event.inputs.version_number }}
+          destination_branch: master
+          pr_title: Merge Release ${{ github.event.inputs.version_number }} Into Master
+          pr_reviewer: ${{ github.actor }} # By default, we request a review from the person who triggered the workflow.
+          pr_assignee: ${{ github.actor }}
+          pr_label: release
+          pr_body: |
+            Hi @${{ github.actor }}
+            This PR was created in response to the release workflow for version number: ${{ github.event.inputs.version_number }}
+            - I've bumped the versions in this commit: ${{ steps.make-version-commit.outputs.commit }}
+
+            Merging this PR will create a GitHub release (Tag) and complete the release flow.
+            **Note:** You shouldn't squash and merge this PR. Use a normal merge instead.

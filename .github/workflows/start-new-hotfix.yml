@@ -1,0 +1,57 @@
+name: Start a new hotfix
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_number:
+        description: Version Number
+        required: true
+jobs:
+  start-new-hotfix:
+    name: Start a new hotfix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: master
+
+      - name: Create hotfix branch
+        run: git checkout -b hotfix/${{ github.event.inputs.version_number }}
+
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "Alfred Swift"
+          git config user.email ios@swvl.com
+
+      - name: Bump version
+        run: |
+          sed -i'' 's/MARKETING_VERSION \= [^\;]*\;/MARKETING_VERSION = ${{ github.event.inputs.version_number }};/' Swvl.xcodeproj/project.pbxproj
+          perl -i -pe 's/(CURRENT_PROJECT_VERSION = )(\d+)(\;)$/$1.($2+1).$3/e' Swvl.xcodeproj/project.pbxproj
+
+      - name: Commit changes
+        id: make-version-commit
+        run: |
+          git add .
+          git commit --message "Bump version number"
+          echo "::set-output name=commit::$(git rev-parse HEAD)"
+
+      - name: Push hotfix branch
+        run: git push origin hotfix/${{ github.event.inputs.version_number }}
+
+      - name: Create pull request
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: hotfix/${{ github.event.inputs.version_number }}
+          destination_branch: master
+          pr_title: Merge Hotfix ${{ github.event.inputs.version_number }} Into Master
+          pr_reviewer: ${{ github.actor }}
+          pr_assignee: ${{ github.actor }}
+          pr_label: hotfix
+          pr_body: |
+            Hi @${{ github.actor }}
+            This PR was created in response to the hotfix workflow for version number: ${{ github.event.inputs.version_number }}
+            - I've bumped the versions in this commit: ${{ steps.make-version-commit.outputs.commit }}
+
+            Merging this PR will create a GitHub release (Tag) and complete the release flow.
+            **Note:** You shouldn't squash and merge this PR. Use a normal merge instead.
