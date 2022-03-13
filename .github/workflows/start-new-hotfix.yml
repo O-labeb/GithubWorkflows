@@ -16,21 +16,17 @@ jobs:
       - name: Set test variable
         id: set-variable
         run: |
-          if [ ${{ github.ref }} != 'refs/heads/main' ]; then
-            echo "IS NOT main branch"
-            echo "::set-output name=test::abc"
+          if [ ${{ github.event.inputs.version_number }} ]; then
+            echo "::set-output name=test::${{ github.event.inputs.version_number }}"
           else
-            echo "IS main branch"
-            echo "::set-output name=test::123"
+            echo "::set-output name=test::2081996"
           fi
-        shell: bash
-      - name: Read exported variable
-        run: |
-          echo "OUTPUT: ${{ steps.check.test-env.test }}"
 
   start-new-hotfix:
     name: Start a new hotfix
     runs-on: ubuntu-latest
+    env:
+      adjusted_version: ${{needs.setup-job.outputs.var1}}
     needs: [setup-job]
     steps:
       - uses: actions/checkout@v2
@@ -40,8 +36,7 @@ jobs:
       - name: Set var
         run: |
           Version=koko
-          echo $Version
-          echo "OUTPUT: ${{needs.setup-job.outputs.var1}}"
+          echo $adjusted_version
           
       - name: Create hotfix branch
         run: git checkout -b ${{ github.event.inputs.version_number }}
