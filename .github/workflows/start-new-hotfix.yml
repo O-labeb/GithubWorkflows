@@ -5,7 +5,7 @@ on:
     inputs:
       version_number:
         description: Version Number
-        required: true
+        required: false
 jobs:
   start-new-hotfix:
     name: Start a new hotfix
