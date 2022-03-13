@@ -29,7 +29,7 @@ jobs:
 
       - name: Print stuff
         run: |
-          echo ${{ version_number }}
+          echo ${version_number}
 
       - name: Bump version
         run: |
